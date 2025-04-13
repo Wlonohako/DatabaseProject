@@ -154,8 +154,6 @@ void MainWindow::on_execQuery_clicked()
     model->setQuery(std::move(*query));
     ui->dbView->setModel(model);
     ui->dbView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
-    on_dbOpenButton_clicked();
 }
 
 void MainWindow::on_dbOpenButton_clicked()
