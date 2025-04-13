@@ -28,7 +28,6 @@ void MainWindow::showDatabseNames(){
     fillters << "*.sqlite";
     QStringList fileList = dir.entryList(fillters, QDir::Files);
     qDebug() << fileList;
-    //zmień to na list widget chyba
     QStringListModel *model = new QStringListModel(this);
     model->setStringList(fileList);
     ui->dbList->setModel(model);
@@ -37,19 +36,25 @@ void MainWindow::showDatabseNames(){
 void MainWindow::on_dbNameButton_clicked()
 {
     showDatabseNames();
-    QString dbName = ui->dbNameEdit->text();
-    dbName = dbName +  + ".sqlite";
-    if (QSqlDatabase::contains(dbName)) {
-        db = QSqlDatabase::database(dbName);
-        QMessageBox::warning(this, "Creating Error", "Database with this name arleady exist!");
-        qDebug() << "Warning: Database exist";
 
-    } else {
-        db = QSqlDatabase::addDatabase("QSQLITE", dbName);
-        db.setDatabaseName(dbName);
-        qDebug() << "Info: Database created";
+    QString dbName = ui->dbNameEdit->text();
+    QString fullDbName = dbName + ".sqlite";
+
+    if (QFile::exists(fullDbName)) {
+        QMessageBox::warning(this, "Creating Error", "Database with this name already exists!");
+        qDebug() << "Warning: Database file exists";
+        return;
     }
 
+    if (QSqlDatabase::contains(dbName)) {
+        db = QSqlDatabase::database(dbName);
+    } else {
+        db = QSqlDatabase::addDatabase("QSQLITE", dbName);
+        db.setDatabaseName(fullDbName);
+        QMessageBox::information(this, "Database created", "Database created");
+        qDebug() << "Info: Database created";
+    }
+    ui->dbNameEdit->setText("");
     if (!db.isOpen()) {
         if (!db.open()) {
             QMessageBox::critical(this, "Database Error", db.lastError().text());
@@ -92,7 +97,7 @@ void MainWindow::on_dbNameButton_clicked()
 
 
 showDatabseNames();
-
+db.close();
 }
 
 void MainWindow::on_execQuery_clicked()
@@ -131,4 +136,75 @@ void MainWindow::on_execQuery_clicked()
     model->setQuery(std::move(*query));
     ui->dbView->setModel(model);
     ui->dbView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+}
+
+void MainWindow::on_dbOpenButton_clicked()
+{
+    QModelIndexList selectedIndex = ui->dbList->selectionModel()->selectedIndexes();
+
+    QString selectedDB = selectedIndex.first().data().toString();
+    QFileInfo info(selectedDB);
+    QString connectionName = info.baseName();
+
+    ui->dbOpenedName->setText("OPENED DATABASE: " + selectedDB);
+    qDebug() << "Selected string:" << selectedDB;
+    qDebug() << "Connection name:" << connectionName;
+
+    if (QSqlDatabase::contains(connectionName)) {
+        db = QSqlDatabase::database(connectionName);
+    } else {
+        db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+        db.setDatabaseName(selectedDB);
+    }
+
+    if (!db.isOpen() && !db.open()) {
+        QMessageBox::critical(this, "Database Error", db.lastError().text());
+        return;
+    }
+    QStringList tables = db.tables();
+    qDebug() << tables;
+    QStringListModel *model = new QStringListModel(this);
+    model->setStringList(tables);
+    ui->tablesView->setModel(model);
+}
+
+void MainWindow::on_showColumnButton_clicked()
+{
+    QModelIndexList selectedIndex = ui->tablesView->selectionModel()->selectedIndexes();
+    QString selectedTable = selectedIndex.first().data().toString();
+
+    if (!db.isValid()) {
+        QMessageBox::critical(this, "Database Error", "Database is not initialized!");
+        qDebug() << "Database is not initialized!";
+        return;
+    }
+
+    if (!db.isOpen()) {
+        if (!db.open()) {
+            QMessageBox::critical(this, "Database Error", db.lastError().text());
+            qDebug() << "Failed to reopen database: " << db.lastError().text();
+            return;
+        }
+    }
+
+    QString queryText = "PRAGMA table_info(" + selectedTable + ");";
+    qDebug() << "Executing query:" << queryText;
+
+    QSqlQuery *query = new QSqlQuery(db);
+
+    if (!query->exec(queryText)) {
+        QMessageBox::critical(this, "Query Error", query->lastError().text());
+        qDebug() << "Query execution failed: " << query->lastError().text();
+        return;
+    }
+
+    while (query->next()) {
+        QString temp = query->value(0).toString();
+        qDebug() << "Result:" << temp;
+    }
+
+    QSqlQueryModel *model = new QSqlQueryModel();
+    model->setQuery(std::move(*query));
+    ui->columnsView->setModel(model);
+    ui->columnsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }

@@ -25,9 +25,13 @@ private slots:
 
     void showDatabseNames();
 
+    void on_dbOpenButton_clicked();
+
+    void on_showColumnButton_clicked();
+
 private:
     Ui::MainWindow *ui;
-    QString dbName;
     QSqlDatabase db;
+    QSqlDatabase dbInit;
 };
 #endif // MAINWINDOW_H

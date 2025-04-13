@@ -155,7 +155,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QTableView" name="columnsView"/>
+      <widget class="QListView" name="tablesView"/>
      </item>
      <item>
       <widget class="QPushButton" name="showColumnButton">
@@ -165,7 +165,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QTableView" name="columnView"/>
+      <widget class="QTableView" name="columnsView"/>
      </item>
     </layout>
    </widget>
