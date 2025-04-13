@@ -47,26 +47,24 @@ void MainWindow::on_dbNameButton_clicked()
     }
 
     if (QSqlDatabase::contains(dbName)) {
-        db = QSqlDatabase::database(dbName);
+        dbInit = QSqlDatabase::database(dbName);
     } else {
-        db = QSqlDatabase::addDatabase("QSQLITE", dbName);
-        db.setDatabaseName(fullDbName);
+        dbInit = QSqlDatabase::addDatabase("QSQLITE", dbName);
+        dbInit.setDatabaseName(fullDbName);
         QMessageBox::information(this, "Database created", "Database created");
         qDebug() << "Info: Database created";
     }
     ui->dbNameEdit->setText("");
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            QMessageBox::critical(this, "Database Error", db.lastError().text());
-            qDebug() << "Failed to reopen database: " << db.lastError().text();
+    if (!dbInit.isOpen()) {
+        if (!dbInit.open()) {
+            QMessageBox::critical(this, "Database Error", dbInit.lastError().text());
+            qDebug() << "Failed to reopen database: " << dbInit.lastError().text();
             return;
         }
     }
-    qDebug() << "Database successfully opened: " << db.databaseName();
+    qDebug() << "Database successfully opened: " << dbInit.databaseName();
 
-
-
-    QSqlQuery query(db);
+    QSqlQuery query(dbInit);
     QString createTableText = R"(
     CREATE TABLE IF NOT EXISTS users (
         id INT PRIMARY KEY,
@@ -97,7 +95,12 @@ void MainWindow::on_dbNameButton_clicked()
 
 
 showDatabseNames();
-db.close();
+if (dbInit.isOpen()) {
+    dbInit.close();
+    qDebug() << "Database connection closed: " << dbInit.databaseName();
+} else {
+    qDebug() << "Database was already closed.";
+}
 }
 
 void MainWindow::on_execQuery_clicked()
@@ -150,12 +153,14 @@ void MainWindow::on_dbOpenButton_clicked()
     qDebug() << "Selected string:" << selectedDB;
     qDebug() << "Connection name:" << connectionName;
 
-    if (QSqlDatabase::contains(connectionName)) {
-        db = QSqlDatabase::database(connectionName);
-    } else {
-        db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
-        db.setDatabaseName(selectedDB);
+    qDebug() << "Available drivers: " << QSqlDatabase::drivers();
+    if (!QSqlDatabase::drivers().contains("QSQLITE")) {
+        QMessageBox::critical(this, "Driver Error", "SQLite driver is not available!");
+        return;
     }
+
+    db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+    db.setDatabaseName(selectedDB);
 
     if (!db.isOpen() && !db.open()) {
         QMessageBox::critical(this, "Database Error", db.lastError().text());
