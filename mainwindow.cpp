@@ -6,12 +6,14 @@
 #include <QSqlError>
 #include <QSqlQueryModel>
 #include <QDebug>
-
+#include <QDir>
+#include <QStringListModel>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    showDatabseNames();
 }
 
 MainWindow::~MainWindow()
@@ -19,16 +21,35 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::showDatabseNames(){
+    QDir dir(QDir::currentPath());
+    qDebug() << dir.absolutePath();
+    QStringList fillters;
+    fillters << "*.sqlite";
+    QStringList fileList = dir.entryList(fillters, QDir::Files);
+    qDebug() << fileList;
+    //zmień to na list widget chyba
+    QStringListModel *model = new QStringListModel(this);
+    model->setStringList(fileList);
+    ui->dbList->setModel(model);
+}
+
 void MainWindow::on_dbNameButton_clicked()
 {
+    showDatabseNames();
     QString dbName = ui->dbNameEdit->text();
-
+    dbName = dbName +  + ".sqlite";
     if (QSqlDatabase::contains(dbName)) {
         db = QSqlDatabase::database(dbName);
+        QMessageBox::warning(this, "Creating Error", "Database with this name arleady exist!");
+        qDebug() << "Warning: Database exist";
+
     } else {
         db = QSqlDatabase::addDatabase("QSQLITE", dbName);
         db.setDatabaseName(dbName);
+        qDebug() << "Info: Database created";
     }
+
     if (!db.isOpen()) {
         if (!db.open()) {
             QMessageBox::critical(this, "Database Error", db.lastError().text());
@@ -36,7 +57,7 @@ void MainWindow::on_dbNameButton_clicked()
             return;
         }
     }
-        qDebug() << "Database successfully opened: " << db.databaseName();
+    qDebug() << "Database successfully opened: " << db.databaseName();
 
 
 
@@ -70,9 +91,7 @@ void MainWindow::on_dbNameButton_clicked()
     }
 
 
-
-
-
+showDatabseNames();
 
 }
 

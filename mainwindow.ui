@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1540</width>
+    <height>794</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,12 +18,12 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>0</y>
-      <width>171</width>
-      <height>121</height>
+      <y>30</y>
+      <width>331</width>
+      <height>731</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="dbNameLayout">
+    <layout class="QVBoxLayout" name="dbLayout">
      <item>
       <widget class="QLabel" name="dbName">
        <property name="text">
@@ -31,6 +31,9 @@
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+       <property name="margin">
+        <number>10</number>
        </property>
       </widget>
      </item>
@@ -44,7 +47,43 @@
      <item>
       <widget class="QPushButton" name="dbNameButton">
        <property name="text">
-        <string>CREATE/OPEN</string>
+        <string>CREATE</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="dbListName">
+       <property name="text">
+        <string>DATABASE LIST</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+       <property name="margin">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QListView" name="dbList"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="dbOpenButton">
+       <property name="text">
+        <string>OPEN</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="dbOpenedName">
+       <property name="text">
+        <string>OPENED DATABASE:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+       <property name="margin">
+        <number>10</number>
        </property>
       </widget>
      </item>
@@ -53,10 +92,10 @@
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>0</y>
-      <width>631</width>
-      <height>121</height>
+      <x>830</x>
+      <y>30</y>
+      <width>701</width>
+      <height>731</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="queryLayout">
@@ -80,23 +119,55 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QTableView" name="dbView">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
-   <widget class="QTableView" name="dbView">
+   <widget class="QWidget" name="verticalLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>121</y>
-      <width>801</width>
-      <height>481</height>
+      <x>390</x>
+      <y>30</y>
+      <width>411</width>
+      <height>731</height>
      </rect>
     </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
+    <layout class="QVBoxLayout" name="detailedDBLayout">
+     <item>
+      <widget class="QLabel" name="tables">
+       <property name="text">
+        <string>TABLES</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignCenter</set>
+       </property>
+       <property name="margin">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTableView" name="columnsView"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="showColumnButton">
+       <property name="text">
+        <string>SHOW COLUMNS</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTableView" name="columnView"/>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

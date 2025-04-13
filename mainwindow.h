@@ -23,6 +23,8 @@ private slots:
 
     void on_execQuery_clicked();
 
+    void showDatabseNames();
+
 private:
     Ui::MainWindow *ui;
     QString dbName;
